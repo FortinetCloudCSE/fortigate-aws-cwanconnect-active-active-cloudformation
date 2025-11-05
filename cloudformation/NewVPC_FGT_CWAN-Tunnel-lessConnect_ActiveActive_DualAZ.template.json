@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "(v15.1) AWS CFT to deploy an Active-Active solution integrated with Cloud WAN Tunnel-less Connect, repo: https://github.com/FortinetCloudCSE/fortigate-aws-cwanconnect-active-active-cloudformation",
+	"Description": "(v15.2) AWS CFT to deploy an Active-Active solution integrated with Cloud WAN Tunnel-less Connect, repo: https://github.com/FortinetCloudCSE/fortigate-aws-cwanconnect-active-active-cloudformation",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
 			"ParameterGroups": [
@@ -2188,6 +2188,10 @@
 								"set route-map-out rmap-aspath1",
 								"set capability-default-originate enable",
 								"set default-originate-routemap rmap-aspath1",
+								"set advertisement-interval 1",
+								"set keep-alive-timer 3",
+								"set holdtime-timer 9",
+								"set connect-timer 9",
 								"next",
 								"edit {ConnectPeerIP2}",
 								"set ebgp-enforce-multihop enable",
@@ -2196,6 +2200,10 @@
 								"set route-map-out rmap-aspath1",
 								"set capability-default-originate enable",
 								"set default-originate-routemap rmap-aspath1",
+								"set advertisement-interval 1",
+								"set keep-alive-timer 3",
+								"set holdtime-timer 9",
+								"set connect-timer 9",
 								"next",
 								"end",
 								"end",
