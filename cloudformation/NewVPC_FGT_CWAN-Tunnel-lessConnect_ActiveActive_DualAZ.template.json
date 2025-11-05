@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "(v15.0) AWS CFT to deploy a dual AZ A-P solution, repo: https://github.com/FortinetCloudCSE/fortigate-aws-ha-dualaz-cloudformation",
+	"Description": "(v15.1) AWS CFT to deploy an Active-Active solution integrated with Cloud WAN Tunnel-less Connect, repo: https://github.com/FortinetCloudCSE/fortigate-aws-cwanconnect-active-active-cloudformation",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
 			"ParameterGroups": [
@@ -1319,46 +1319,6 @@
 				"RouteTableId": {
 					"Ref": "AttachmentRouteTable"
 				}
-			}
-		},
-		"S3Endpoint": {
-			"Type": "AWS::EC2::VPCEndpoint",
-			"Condition": "BYOL",
-			"Properties": {
-				"PolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [
-						{
-							"Effect": "Allow",
-							"Principal": "*",
-							"Action": [
-								"s3:GetObject"
-							],
-							"Resource": [
-								"*"
-							]
-						}
-					]
-				},
-				"RouteTableIds": [
-					{
-						"Ref": "PublicRouteTable"
-					}
-				],
-				"ServiceName": {
-					"Fn::Sub": "com.amazonaws.${AWS::Region}.s3"
-				},
-				"VpcId": {
-					"Ref": "VPC"
-				},
-				"Tags": [
-					{
-						"Key": "Name",
-						"Value": {
-							"Fn::Sub": "${AWS::StackName}-S3Endpoint"
-						}
-					}
-				]
 			}
 		},
 		"InstanceRole": {
