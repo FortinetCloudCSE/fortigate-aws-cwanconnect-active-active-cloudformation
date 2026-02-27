@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "(v15.7) AWS CFT to deploy an Active-Active solution integrated with Cloud WAN Tunnel-less Connect, repo: https://github.com/FortinetCloudCSE/fortigate-aws-cwanconnect-active-active-cloudformation",
+	"Description": "(v26.1.a) AWS CFT to deploy an Active-Active solution integrated with Cloud WAN Tunnel-less Connect, repo: https://github.com/FortinetCloudCSE/fortigate-aws-cwanconnect-active-active-cloudformation",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
 			"ParameterGroups": [
@@ -963,7 +963,15 @@
 			"Type": "AWS::NetworkManager::ConnectAttachment",
 			"Properties": {
 				"CoreNetworkId": {
-					"Ref": "CoreNetwork"
+					"Fn::If": [
+						"CreateCwan",
+						{
+							"Ref": "CoreNetwork"
+						},
+						{
+							"Ref": "CwanExisting"
+						}
+					]
 				},
 				"EdgeLocation": {
 					"Ref": "AWS::Region"
@@ -1016,10 +1024,7 @@
 					"Ref": "CloudWanConnectAttachment"
 				},
 				"PeerAddress": {
-					"Fn::GetAtt": [
-						"Fgt1Eni1",
-						"PrimaryPrivateIpAddress"
-					]
+					"Fn::Sub": "${Fgt1Eni1.PrimaryPrivateIpAddress}"
 				},
 				"SubnetArn": {
 					"Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${PrivateSubnet1}"
@@ -1046,10 +1051,7 @@
 					"Ref": "CloudWanConnectAttachment"
 				},
 				"PeerAddress": {
-					"Fn::GetAtt": [
-						"Fgt2Eni1",
-						"PrimaryPrivateIpAddress"
-					]
+					"Fn::Sub": "${Fgt2Eni1.PrimaryPrivateIpAddress}"
 				},
 				"SubnetArn": {
 					"Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${PrivateSubnet2}"
@@ -1069,10 +1071,7 @@
 			"Properties": {
 				"Handler": "index.handler",
 				"Role": {
-					"Fn::GetAtt": [
-						"LambdaRole",
-						"Arn"
-					]
+					"Fn::Sub": "${LambdaRole.Arn}"
 				},
 				"Code": {
 					"ZipFile": {
@@ -1125,10 +1124,7 @@
 			"Type": "Custom::DescribeNMConnectPeer",
 			"Properties": {
 				"ServiceToken": {
-					"Fn::GetAtt": [
-						"DescribeNMConnectPeer",
-						"Arn"
-					]
+					"Fn::Sub": "${DescribeNMConnectPeer.Arn}"
 				},
 				"ConnectPeerId": {
 					"Ref": "CloudWanConnectPeer1"
@@ -1139,10 +1135,7 @@
 			"Type": "Custom::DescribeNMConnectPeer",
 			"Properties": {
 				"ServiceToken": {
-					"Fn::GetAtt": [
-						"DescribeNMConnectPeer",
-						"Arn"
-					]
+					"Fn::Sub": "${DescribeNMConnectPeer.Arn}"
 				},
 				"ConnectPeerId": {
 					"Ref": "CloudWanConnectPeer2"
@@ -1422,10 +1415,7 @@
 			],
 			"Properties": {
 				"ImageId": {
-					"Fn::GetAtt": [
-						"RunImageFunction",
-						"ami"
-					]
+					"Fn::Sub": "${RunImageFunction.ami}"
 				},
 				"InstanceType": {
 					"Ref": "InstanceType"
@@ -1501,10 +1491,7 @@
 										"MIME-Version: 1.0",
 										"",
 										{
-											"Fn::GetAtt": [
-												"RunInitFunction1",
-												"fgt_config"
-											]
+											"Fn::Sub": "${RunInitFunction1.fgt_config}"
 										},
 										"",
 										{
@@ -1549,10 +1536,7 @@
 			],
 			"Properties": {
 				"ImageId": {
-					"Fn::GetAtt": [
-						"RunImageFunction",
-						"ami"
-					]
+					"Fn::Sub": "${RunImageFunction.ami}"
 				},
 				"InstanceType": {
 					"Ref": "InstanceType"
@@ -1628,10 +1612,7 @@
 										"MIME-Version: 1.0",
 										"",
 										{
-											"Fn::GetAtt": [
-												"RunInitFunction2",
-												"fgt_config"
-											]
+											"Fn::Sub": "${RunInitFunction2.fgt_config}"
 										},
 										"",
 										{
@@ -1800,10 +1781,7 @@
 			"Type": "AWS::EC2::EIPAssociation",
 			"Properties": {
 				"AllocationId": {
-					"Fn::GetAtt": [
-						"Fgt1EIP",
-						"AllocationId"
-					]
+					"Fn::Sub": "${Fgt1EIP.AllocationId}"
 				},
 				"NetworkInterfaceId": {
 					"Ref": "Fgt1Eni0"
@@ -1819,10 +1797,7 @@
 			"Type": "AWS::EC2::EIPAssociation",
 			"Properties": {
 				"AllocationId": {
-					"Fn::GetAtt": [
-						"Fgt2EIP",
-						"AllocationId"
-					]
+					"Fn::Sub": "${Fgt2EIP.AllocationId}"
 				},
 				"NetworkInterfaceId": {
 					"Ref": "Fgt2Eni0"
@@ -1941,10 +1916,7 @@
 					}
 				},
 				"Role": {
-					"Fn::GetAtt": [
-						"LambdaRole",
-						"Arn"
-					]
+					"Fn::Sub": "${LambdaRole.Arn}"
 				},
 				"Timeout": 120,
 				"Handler": "index.handler",
@@ -1956,10 +1928,7 @@
 			"Type": "Custom::ImageFunction",
 			"Properties": {
 				"ServiceToken": {
-					"Fn::GetAtt": [
-						"ImageFunction",
-						"Arn"
-					]
+					"Fn::Sub": "${ImageFunction.Arn}"
 				},
 				"SearchString": {
 					"Fn::If": [
@@ -2291,10 +2260,7 @@
 					}
 				},
 				"Role": {
-					"Fn::GetAtt": [
-						"LambdaRole",
-						"Arn"
-					]
+					"Fn::Sub": "${LambdaRole.Arn}"
 				},
 				"Timeout": 120,
 				"Handler": "index.handler",
@@ -2306,10 +2272,7 @@
 			"Type": "Custom::InitFunction",
 			"Properties": {
 				"ServiceToken": {
-					"Fn::GetAtt": [
-						"InitFunction",
-						"Arn"
-					]
+					"Fn::Sub": "${InitFunction.Arn}"
 				},
 				"S3Bucket": {
 					"Ref": "InitS3Bucket"
@@ -2342,42 +2305,27 @@
 							"',",
 							"'Port1IP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt1Eni0",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt1Eni0.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'Port2IP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt1Eni1",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt1Eni1.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'ConnectPeerIP1':'",
 							{
-								"Fn::GetAtt": [
-									"RunDescribeNMConnectPeer1",
-									"ip1"
-								]
+								"Fn::Sub": "${RunDescribeNMConnectPeer1.ip1}"
 							},
 							"',",
 							"'ConnectPeerIP2':'",
 							{
-								"Fn::GetAtt": [
-									"RunDescribeNMConnectPeer1",
-									"ip2"
-								]
+								"Fn::Sub": "${RunDescribeNMConnectPeer1.ip2}"
 							},
 							"',",
 							"'FGSPpeerIP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt2Eni1",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt2Eni1.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'FGSPmemberID':'1',",
@@ -2392,10 +2340,7 @@
 			"Type": "Custom::InitFunction",
 			"Properties": {
 				"ServiceToken": {
-					"Fn::GetAtt": [
-						"InitFunction",
-						"Arn"
-					]
+					"Fn::Sub": "${InitFunction.Arn}"
 				},
 				"S3Bucket": {
 					"Ref": "InitS3Bucket"
@@ -2428,42 +2373,27 @@
 							"',",
 							"'Port1IP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt2Eni0",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt2Eni0.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'Port2IP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt2Eni1",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt2Eni1.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'ConnectPeerIP1':'",
 							{
-								"Fn::GetAtt": [
-									"RunDescribeNMConnectPeer2",
-									"ip1"
-								]
+								"Fn::Sub": "${RunDescribeNMConnectPeer2.ip1}"
 							},
 							"',",
 							"'ConnectPeerIP2':'",
 							{
-								"Fn::GetAtt": [
-									"RunDescribeNMConnectPeer2",
-									"ip2"
-								]
+								"Fn::Sub": "${RunDescribeNMConnectPeer2.ip2}"
 							},
 							"',",
 							"'FGSPpeerIP':'",
 							{
-								"Fn::GetAtt": [
-									"Fgt1Eni1",
-									"PrimaryPrivateIpAddress"
-								]
+								"Fn::Sub": "${Fgt1Eni1.PrimaryPrivateIpAddress}"
 							},
 							"',",
 							"'FGSPmemberID':'2',",
